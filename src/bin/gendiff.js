@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import start from '../index'; // eslint-disable-line
+import start from '..';
 
 
-console.log('HELLO');
-start();
+// console.log('HELLO');
+export default start();

@@ -1,11 +1,14 @@
 {
-  "name": "gendiff",
-  "version": "0.1.0",
+  "name": "gendiff-la",
+  "version": "0.1.1",
   "description": "gendiff CLI",
   "main": "index.js",
   "bin": {
-    "gendiff": "src/bin/gendiff.js"
+    "gendiff": "dist/bin/gendiff.js"
   },
+  "files": [
+      "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "babel-node": "babel-node",
@@ -19,9 +22,21 @@
     "babel-cli": "*",
     "babel-core": "*",
     "babel-preset-env": "*",
-    "babel-preset-stage-0": "*"
+    "babel-preset-stage-0": "*",
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   },
   "dependencies": {
     "commander": "^2.13.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exces-s/project-lvl2-s185.git"
+  },
+  "bugs": {
+    "url": "https://github.com/exces-s/project-lvl2-s185/issues"
+  },
+  "homepage": "https://github.com/exces-s/project-lvl2-s185#readme"
 }

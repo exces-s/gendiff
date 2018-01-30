@@ -2,7 +2,11 @@ import commander from 'commander';
 import fs from 'fs';
 import _ from 'lodash';
 
-const resultToSqreen = arr => `{\n${arr.join('\n')}\n}`;
+const resultToSqreen = (arr) => {
+  const result = (`{\n${arr.join('\n')}\n}`);
+  console.log(result);
+  return result;
+};
 
 export const compare = (oldPathToFile, newPathToFile) => {
   const oldFile = JSON.parse(fs.readFileSync(oldPathToFile));

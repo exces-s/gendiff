@@ -9,3 +9,6 @@ publish:
 
 lint:
 	npm run eslint -- src/bin/*.js
+
+test:
+	npm test

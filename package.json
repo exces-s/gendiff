@@ -28,8 +28,10 @@
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "*",
     "jest": "^22.1.4",
-    "regenerator-runtime": "^0.11.1"
+    "regenerator-runtime": "^0.11.1",
+    "jest-cli": "*"
   },
   "dependencies": {
     "commander": "^2.13.0",

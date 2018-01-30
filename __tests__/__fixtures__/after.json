@@ -1,5 +1,3 @@
-after.json:
-
 {
   "timeout": 20,
   "verbose": true,

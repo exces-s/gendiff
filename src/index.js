@@ -2,25 +2,28 @@ import commander from 'commander';
 import fs from 'fs';
 import _ from 'lodash';
 
-const compare = (file1, file2) => {
-  const f1 = JSON.parse(fs.readFileSync(file1));
-  const f2 = JSON.parse(fs.readFileSync(file2));
-  const f1Keys = Object.keys(f1);
-  const f2Keys = Object.keys(f2);
+const resultToSqreen = arr => `{\n${arr.join('\n')}\n}`;
 
-  const commonKeys = _.intersection(f1Keys, f2Keys);
-  const f1UniqKeys = _.difference(f1Keys, commonKeys);
-  const f2UniqKeys = _.difference(f2Keys, commonKeys);
+export const compare = (oldPathToFile, newPathToFile) => {
+  const oldFile = JSON.parse(fs.readFileSync(oldPathToFile));
+  const newFile = JSON.parse(fs.readFileSync(newPathToFile));
+  const oldFileKeys = Object.keys(oldFile);
+  const newFileKeys = Object.keys(newFile);
+
+  const commonKeys = _.intersection(oldFileKeys, newFileKeys);
+  const oldUniqKeys = _.difference(oldFileKeys, commonKeys);
+  const newUniqKeys = _.difference(newFileKeys, commonKeys);
 
   const result = [];
-  f1UniqKeys.map(key => result.push(`- ${key}: obj1[key]`));
-  f2UniqKeys.map(key => result.push(`+ ${key}: obj2[key]`));
+  oldUniqKeys.map(key => result.push(`- ${key}: ${oldFile[key]}`));
+  newUniqKeys.map(key => result.push(`+ ${key}: ${newFile[key]}`));
   commonKeys.map((key) => {
-    if (f2[key] === f1[key]) {
-      return result.push(`  ${key}: obj2[key]`);
+    if (oldFile[key] === newFile[key]) {
+      return result.push(`  ${key}: ${newFile[key]}`);
     }
-    return result.push(`+ ${key}: obj2[key]\n- ${key}: obj1[key]`);
+    return result.push(`+ ${key}: ${newFile[key]}`, `- ${key}: ${oldFile[key]}`);
   });
+  return resultToSqreen(result);
 };
 
 const program = commander;
@@ -30,7 +33,7 @@ program
   .arguments('<file1> <file2>')
   .description('Compares two configuration files and shows a difference.')
   .option('-f, --format [type]', 'Output format')
-  .action(compare);
+  .action((file1, file2) => compare(file1, file2));
 
 const start = () => program.parse(process.argv);
 export default start;

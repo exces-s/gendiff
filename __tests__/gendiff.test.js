@@ -1,4 +1,4 @@
-import { gendiff } from '../src';
+import gendiff from '../src';
 
 const result = `{
 - proxy: 123.234.53.22
@@ -11,8 +11,6 @@ const result = `{
 
 const oldFileJSON = '__tests__/__fixtures__/before.json';
 const newFileJSON = '__tests__/__fixtures__/after.json';
-
-// const sortResult = result.slice().sort();
 
 test('compare flat JSONs', () => {
   expect(gendiff(oldFileJSON, newFileJSON)).toEqual(result);

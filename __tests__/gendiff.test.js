@@ -1,12 +1,13 @@
 import { gendiff } from '../src';
 
-const result = [
-  '- proxy: 123.234.53.22',
-  '+ verbose: true',
-  '  host: hexlet.io',
-  '+ timeout: 20',
-  '- timeout: 50',
-];
+const result = `{
+- proxy: 123.234.53.22
++ verbose: true
+  host: hexlet.io
++ timeout: 20
+- timeout: 50
+}`;
+
 
 const oldFileJSON = '__tests__/__fixtures__/before.json';
 const newFileJSON = '__tests__/__fixtures__/after.json';

@@ -4,9 +4,8 @@ import fs from 'fs';
 import _ from 'lodash';
 
 const resultToSqreen = (arr) => {
-console.log(`screen: ${arr}`);
   const result = (`{\n${arr.join('\n')}\n}`);
-  return arr;
+  return result;
 };
 
 const selectParser = [

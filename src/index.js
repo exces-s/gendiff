@@ -1,16 +1,34 @@
 import commander from 'commander';
+import yaml from 'js-yaml';
 import fs from 'fs';
 import _ from 'lodash';
 
 const resultToSqreen = (arr) => {
+console.log(`screen: ${arr}`);
   const result = (`{\n${arr.join('\n')}\n}`);
-  console.log(result);
-  return result;
+  return arr;
 };
 
-export const compare = (oldPathToFile, newPathToFile) => {
-  const oldFile = JSON.parse(fs.readFileSync(oldPathToFile));
-  const newFile = JSON.parse(fs.readFileSync(newPathToFile));
+const selectParser = [
+  {
+    type: '.json',
+    parser: arg => JSON.parse(fs.readFileSync(arg, 'utf8')),
+  },
+  {
+    type: '.yml',
+    parser: arg => yaml.safeLoad(fs.readFileSync(arg, 'utf8')),
+  },
+];
+
+const getParser = arg => _.find(selectParser, ({ type }) => arg.endsWith(type));
+
+export const gendiff = (oldPathToFile, newPathToFile) => {
+  const { parser: oldFileParser } = getParser(oldPathToFile);
+  const { parser: newFileParser } = getParser(newPathToFile);
+
+  const oldFile = oldFileParser(oldPathToFile);
+  const newFile = newFileParser(newPathToFile);
+
   const oldFileKeys = Object.keys(oldFile);
   const newFileKeys = Object.keys(newFile);
 
@@ -37,7 +55,7 @@ program
   .arguments('<file1> <file2>')
   .description('Compares two configuration files and shows a difference.')
   .option('-f, --format [type]', 'Output format')
-  .action((file1, file2) => compare(file1, file2));
+  .action((file1, file2) => gendiff(file1, file2));
 
 const start = () => program.parse(process.argv);
 export default start;

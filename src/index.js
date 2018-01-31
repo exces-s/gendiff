@@ -1,49 +1,68 @@
 import yaml from 'js-yaml';
 import fs from 'fs';
+import path from 'path';
 import _ from 'lodash';
-
-const resultToSqreen = (arr) => {
-  const result = (`{\n${arr.join('\n')}\n}`);
-  return result;
-};
 
 const selectParser = [
   {
     type: '.json',
-    parser: arg => JSON.parse(fs.readFileSync(arg, 'utf8')),
+    parser: arg => JSON.parse(arg),
   },
   {
     type: '.yml',
-    parser: arg => yaml.safeLoad(fs.readFileSync(arg, 'utf8')),
+    parser: arg => yaml.safeLoad(arg),
   },
 ];
 
-const getParser = arg => _.find(selectParser, ({ type }) => arg.endsWith(type));
+const getParser = arg => _.find(selectParser, ({ type }) => arg === type);
 
-const gendiff = (oldPathToFile, newPathToFile) => {
-  const { parser: oldFileParser } = getParser(oldPathToFile);
-  const { parser: newFileParser } = getParser(newPathToFile);
+const parseFile = (readedFile, typeFile) => {
+  const { parser: fileParser } = getParser(typeFile);
+  return fileParser(readedFile);
+};
 
-  const oldFile = oldFileParser(oldPathToFile);
-  const newFile = newFileParser(newPathToFile);
-
+const diffSearch = (oldFile, newFile) => {
   const oldFileKeys = Object.keys(oldFile);
   const newFileKeys = Object.keys(newFile);
 
-  const commonKeys = _.intersection(oldFileKeys, newFileKeys);
-  const oldUniqKeys = _.difference(oldFileKeys, commonKeys);
-  const newUniqKeys = _.difference(newFileKeys, commonKeys);
-
-  const result = [];
-  oldUniqKeys.map(key => result.push(`- ${key}: ${oldFile[key]}`));
-  newUniqKeys.map(key => result.push(`+ ${key}: ${newFile[key]}`));
-  commonKeys.map((key) => {
-    if (oldFile[key] === newFile[key]) {
-      return result.push(`  ${key}: ${newFile[key]}`);
+  const unionKeys = _.union(oldFileKeys, newFileKeys);
+  const result = unionKeys.map((key) => {
+    if (!(key in newFile)) {
+      return `- ${key}: ${oldFile[key]}`;
     }
-    return result.push(`+ ${key}: ${newFile[key]}`, `- ${key}: ${oldFile[key]}`);
+    if (!(key in oldFile)) {
+      return `+ ${key}: ${newFile[key]}`;
+    }
+    if (oldFile[key] === newFile[key]) {
+      return `  ${key}: ${newFile[key]}`;
+    }
+    if (key in newFile && key in oldFile) {
+      const arr = [`- ${key}: ${oldFile[key]}`,
+        `+ ${key}: ${newFile[key]}`];
+      return arr.join('\n');
+    }
+    return `+ ${key}: ${newFile[key]}`;
   });
-  return resultToSqreen(result);
+  return result;
 };
 
-export default gendiff;
+const displayOutput = (arr) => {
+  const result = (`{\n${arr.join('\n')}\n}\n`);
+  return result;
+};
+
+const genDiff = (oldFile, newFile) => {
+  const oldFileType = path.extname(oldFile);
+  const oldFileReaded = fs.readFileSync(oldFile, 'utf8');
+
+  const newFileType = path.extname(newFile);
+  const newFileReaded = fs.readFileSync(newFile, 'utf8');
+
+  const oldParsedFile = parseFile(oldFileReaded, oldFileType);
+  const newParsedFile = parseFile(newFileReaded, newFileType);
+
+  const diffInArray = diffSearch(oldParsedFile, newParsedFile);
+  return displayOutput(diffInArray);
+};
+
+export default genDiff;

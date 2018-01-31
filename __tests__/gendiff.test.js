@@ -1,24 +1,23 @@
-import gendiff from '../src';
+import fs from 'fs';
+import genDiff from '../src';
 
-const result = `{
-- proxy: 123.234.53.22
-+ verbose: true
-  host: hexlet.io
-+ timeout: 20
-- timeout: 50
-}`;
-
+// path to file from package root
+const result = fs.readFileSync('__tests__/__fixtures__/result.txt', 'utf8');
 
 const oldFileJSON = '__tests__/__fixtures__/before.json';
 const newFileJSON = '__tests__/__fixtures__/after.json';
 
-test('compare flat JSONs', () => {
-  expect(gendiff(oldFileJSON, newFileJSON)).toEqual(result);
-});
-
 const oldFileYAML = '__tests__/__fixtures__/before.yml';
 const newFileYAML = '__tests__/__fixtures__/after.yml';
 
-test('compare flat YAMLs', () => {
-  expect(gendiff(oldFileYAML, newFileYAML)).toEqual(result);
+test('genDiff flat JSONs', () => {
+  expect(genDiff(oldFileJSON, newFileJSON)).toEqual(result);
+});
+
+test('genDiff flat YAMLs', () => {
+  expect(genDiff(oldFileYAML, newFileYAML)).toEqual(result);
+});
+
+test('genDiff flat JSON & YAML', () => {
+  expect(genDiff(oldFileJSON, newFileYAML)).toEqual(result);
 });

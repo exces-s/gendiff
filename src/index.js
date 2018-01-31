@@ -48,6 +48,7 @@ const diffSearch = (oldFile, newFile) => {
 
 const displayOutput = (arr) => {
   const result = (`{\n${arr.join('\n')}\n}\n`);
+  console.log(result);
   return result;
 };
 

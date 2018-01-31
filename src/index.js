@@ -31,7 +31,7 @@ const diffSearch = (dataBefore, dataAfter) => {
   const keysDataAfter = Object.keys(dataAfter);
 
   const unionKeys = _.union(keysDataBefore, keysDataAfter);
-  const result = unionKeys.map((key) => {
+  const arr = unionKeys.map((key) => {
     if (!(key in dataAfter)) {
       return `- ${key}: ${dataBefore[key]}`;
     }
@@ -47,13 +47,15 @@ const diffSearch = (dataBefore, dataAfter) => {
     }
     return `+ ${key}: ${dataAfter[key]}`;
   });
-  return result;
-};
 
-const displayOutput = (arr) => {
   const flattenArr = arr.reduce((acc, value) => acc.concat(value), []);
   const result = `{\n${flattenArr.join('\n')}\n}\n`;
   return result;
+};
+
+const displayOutput = (resultString) => {
+  console.log(resultString);
+  return resultString;
 };
 
 const genDiff = (fileBefore, fileAfter) => {

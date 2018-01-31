@@ -48,8 +48,7 @@ const diffSearch = (dataBefore, dataAfter) => {
     return `+ ${key}: ${dataAfter[key]}`;
   });
 
-  const flattenArr = arr.reduce((acc, value) => acc.concat(value), []);
-  const result = `{\n${flattenArr.join('\n')}\n}\n`;
+  const result = `{\n${_.flatten(arr).join('\n')}\n}\n`;
   return result;
 };
 

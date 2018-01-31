@@ -1,4 +1,5 @@
 import yaml from 'js-yaml';
+import ini from 'ini';
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
@@ -11,6 +12,10 @@ const selectParser = [
   {
     type: '.yml',
     parser: arg => yaml.safeLoad(arg),
+  },
+  {
+    type: '.ini',
+    parser: arg => ini.parse(arg),
   },
 ];
 

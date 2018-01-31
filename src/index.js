@@ -4,26 +4,33 @@ import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 
-const selectParser = [
-  {
-    '.json': JSON.parse,
-  },
-  {
-    '.yml': yaml.safeLoad,
-  },
-  {
-    '.ini': ini.parse,
-  },
-];
-
-const getParser = (dataType) => {
-  const obj = _.find(selectParser, o => o[dataType]);
-  return obj[dataType];
+const selectParser = {
+  '.json': JSON.parse,
+  '.yml': yaml.safeLoad,
+  '.ini': ini.parse,
 };
+
+const getParser = dataType => selectParser[dataType];
 
 const parseData = (data, dataType) => {
   const parse = getParser(dataType);
   return parse(data);
+};
+
+const parseAST = (data) => {
+  const keys = Object.keys(data);
+  const result = keys.reduce((acc, key) => {
+    if (data[key] instanceof Object) {
+      const obj = { key, value: '', children: parseAST(data[key]) };
+      return [...acc, obj];
+    }
+    if (!(data[key] instanceof Object)) {
+      const obj = { key, value: data[key], children: [] };
+      return [...acc, obj];
+    }
+    return null;
+  }, []);
+  return result;
 };
 
 const diffSearch = (dataBefore, dataAfter) => {
@@ -63,7 +70,6 @@ const genDiff = (fileBefore, fileAfter) => {
 
   const dataBefore = fs.readFileSync(fileBefore, 'utf8');
   const dataAfter = fs.readFileSync(fileAfter, 'utf8');
-
   const parsedDataBefore = parseData(dataBefore, typeFileBefore);
   const parsedDataAfter = parseData(dataAfter, typeFileAfter);
 

@@ -6,68 +6,67 @@ import _ from 'lodash';
 
 const selectParser = [
   {
-    type: '.json',
-    parser: arg => JSON.parse(arg),
+    '.json': JSON.parse,
   },
   {
-    type: '.yml',
-    parser: arg => yaml.safeLoad(arg),
+    '.yml': yaml.safeLoad,
   },
   {
-    type: '.ini',
-    parser: arg => ini.parse(arg),
+    '.ini': ini.parse,
   },
 ];
 
-const getParser = arg => _.find(selectParser, ({ type }) => arg === type);
-
-const parseFile = (readedFile, typeFile) => {
-  const { parser: fileParser } = getParser(typeFile);
-  return fileParser(readedFile);
+const getParser = (dataType) => {
+  const obj = _.find(selectParser, o => o[dataType]);
+  return obj[dataType];
 };
 
-const diffSearch = (oldFile, newFile) => {
-  const oldFileKeys = Object.keys(oldFile);
-  const newFileKeys = Object.keys(newFile);
+const parseData = (data, dataType) => {
+  const parse = getParser(dataType);
+  return parse(data);
+};
 
-  const unionKeys = _.union(oldFileKeys, newFileKeys);
+const diffSearch = (dataBefore, dataAfter) => {
+  const keysDataBefore = Object.keys(dataBefore);
+  const keysDataAfter = Object.keys(dataAfter);
+
+  const unionKeys = _.union(keysDataBefore, keysDataAfter);
   const result = unionKeys.map((key) => {
-    if (!(key in newFile)) {
-      return `- ${key}: ${oldFile[key]}`;
+    if (!(key in dataAfter)) {
+      return `- ${key}: ${dataBefore[key]}`;
     }
-    if (!(key in oldFile)) {
-      return `+ ${key}: ${newFile[key]}`;
+    if (!(key in dataBefore)) {
+      return `+ ${key}: ${dataAfter[key]}`;
     }
-    if (oldFile[key] === newFile[key]) {
-      return `  ${key}: ${newFile[key]}`;
+    if (dataBefore[key] === dataAfter[key]) {
+      return `  ${key}: ${dataAfter[key]}`;
     }
-    if (key in newFile && key in oldFile) {
-      const arr = [`- ${key}: ${oldFile[key]}`,
-        `+ ${key}: ${newFile[key]}`];
-      return arr.join('\n');
+    if (key in dataAfter && key in dataBefore) {
+      return [`- ${key}: ${dataBefore[key]}`,
+        `+ ${key}: ${dataAfter[key]}`];
     }
-    return `+ ${key}: ${newFile[key]}`;
+    return `+ ${key}: ${dataAfter[key]}`;
   });
   return result;
 };
 
 const displayOutput = (arr) => {
-  const result = (`{\n${arr.join('\n')}\n}\n`);
-  console.log(result);
+  const flattenArr = arr.reduce((acc, value) => acc.concat(value), []);
+  const result = `{\n${flattenArr.join('\n')}\n}\n`;
   return result;
 };
 
-const genDiff = (oldFile, newFile) => {
-  const oldFileType = path.extname(oldFile);
-  const oldFileReaded = fs.readFileSync(oldFile, 'utf8');
+const genDiff = (fileBefore, fileAfter) => {
+  const typeFileBefore = path.extname(fileBefore);
+  const typeFileAfter = path.extname(fileAfter);
 
-  const newFileType = path.extname(newFile);
-  const newFileReaded = fs.readFileSync(newFile, 'utf8');
+  const dataBefore = fs.readFileSync(fileBefore, 'utf8');
+  const dataAfter = fs.readFileSync(fileAfter, 'utf8');
 
-  const oldParsedFile = parseFile(oldFileReaded, oldFileType);
-  const newParsedFile = parseFile(newFileReaded, newFileType);
+  const parsedDataBefore = parseData(dataBefore, typeFileBefore);
+  const parsedDataAfter = parseData(dataAfter, typeFileAfter);
 
-  const diffInArray = diffSearch(oldParsedFile, newParsedFile);
+  const diffInArray = diffSearch(parsedDataBefore, parsedDataAfter);
   return displayOutput(diffInArray);
 };
 

@@ -2,29 +2,33 @@ import fs from 'fs';
 import genDiff from '../src';
 
 // path to file from package root
-const result = fs.readFileSync('__tests__/__fixtures__/result.txt', 'utf8');
+const pathToResultFile = '__tests__/__fixtures__/result.txt';
 
-const oldJson = '__tests__/__fixtures__/before.json';
-const newJson = '__tests__/__fixtures__/after.json';
+const pathToBeforeJsonFile = '__tests__/__fixtures__/before.json';
+const pathToAfterJsonFile = '__tests__/__fixtures__/after.json';
 
-const oldYaml = '__tests__/__fixtures__/before.yml';
-const newYaml = '__tests__/__fixtures__/after.yml';
+const pathToBeforeYamlFile = '__tests__/__fixtures__/before.yml';
+const pathToAfterYamlFile = '__tests__/__fixtures__/after.yml';
 
-const oldIni = '__tests__/__fixtures__/before.ini';
-const newIni = '__tests__/__fixtures__/after.ini';
+const pathToBeforeIniFile = '__tests__/__fixtures__/before.ini';
+const pathToAfterIniFile = '__tests__/__fixtures__/after.ini';
 
 test('genDiff flat JSONs', () => {
-  expect(genDiff(oldJson, newJson)).toEqual(result);
+  expect(genDiff(pathToBeforeJsonFile, pathToAfterJsonFile))
+    .toEqual(fs.readFileSync(pathToResultFile, 'utf8'));
 });
 
 test('genDiff flat YAMLs', () => {
-  expect(genDiff(oldYaml, newYaml)).toEqual(result);
+  expect(genDiff(pathToBeforeYamlFile, pathToAfterYamlFile))
+    .toEqual(fs.readFileSync(pathToResultFile, 'utf8'));
 });
 
 test('genDiff flat JSON & YAML', () => {
-  expect(genDiff(oldJson, newYaml)).toEqual(result);
+  expect(genDiff(pathToBeforeJsonFile, pathToAfterYamlFile))
+    .toEqual(fs.readFileSync(pathToResultFile, 'utf8'));
 });
 
 test('genDiff flat INIs', () => {
-  expect(genDiff(oldIni, newIni)).toEqual(result);
+  expect(genDiff(pathToBeforeIniFile, pathToAfterIniFile))
+    .toEqual(fs.readFileSync(pathToResultFile, 'utf8'));
 });

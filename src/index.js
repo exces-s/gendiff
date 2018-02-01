@@ -40,10 +40,10 @@ const buildAst = (dataBefore, dataAfter) => {
   const unionKeys = _.union(keysDataBefore, keysDataAfter);
   const ast = unionKeys.map((key) => {
     if (Object.keys(dataBefore).length === 0) {
-      return { key, valueBefore: '', valueAfter: dataAfter[key], type: 'unchanged', children: [] };
+      return { key, valueBefore: dataAfter[key], valueAfter: dataAfter[key], type: 'unchanged', children: [] };
     }
     if (Object.keys(dataAfter).length === 0) {
-      return { key, valueBefore: dataBefore[key], valueAfter: '', type: 'unchanged', children: [] };
+      return { key, valueBefore: dataBefore[key], valueAfter: dataBefore[key], type: 'unchanged', children: [] };
     }
     if (dataBefore[key] instanceof Object || dataAfter[key] instanceof Object) {
       if (JSON.stringify(dataBefore[key]) === JSON.stringify(dataAfter[key])) {
@@ -88,16 +88,16 @@ const buildAst = (dataBefore, dataAfter) => {
 const render = (ast) => {
   const diff = (node) => {
     if (node.type === 'unchanged' && node.children.length === 0) {
-      return `  ${node.key}: ${node.valueAfter}`;
+      return  `  ${node.key}: ${node.valueAfter}`;
     }
     if (node.type === 'added' && node.children.length === 0) {
-      return `+ ${node.key}: ${node.valueAfter}`;
+      return  `+ ${node.key}: ${node.valueAfter}`;
     }
     if (node.type === 'removed' && node.children.length === 0) {
-      return `- ${node.key}: ${node.valueBefore}`;
+      return  `- ${node.key}: ${node.valueBefore}`;
     }
     if (node.type === 'changed' && node.children.length === 0) {
-      return [`- ${node.key}: ${node.valueBefore}\n+ ${node.key}: ${node.valueAfter}`];
+      return  [`- ${node.key}: ${node.valueBefore}\n+ ${node.key}: ${node.valueAfter}`];
     }
     if (node.type === 'unchanged' && node.children.length > 0) {
       return `  ${node.key}: ${render(node.children)}`;
@@ -106,16 +106,16 @@ const render = (ast) => {
       return `+ ${node.key}: ${render(node.children)}`;
     }
     if (node.type === 'removed' && node.children.length > 0) {
-      return `- ${node.key}: ${render(node.children)}`;
+      return  `- ${node.key}: ${render(node.children)}`;
     }
     if (node.type === 'changed' && node.children.length > 0) {
-      return `  ${node.key}: ${render(node.children)}`;
+      return  `  ${node.key}: ${render(node.children)}`;
     }
     return null;
   };
 
   const arr = ast.map(node => diff(node));
-  const result = ['{', ...arr, '}', ''].join('\n');
+  const result = ['{', ...arr, '}'].join('\n');
   return result;
 };
 

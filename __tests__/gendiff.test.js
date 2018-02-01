@@ -15,7 +15,7 @@ const pathToBeforeIniFile = '__tests__/__fixtures__/before.ini';
 const pathToAfterIniFile = '__tests__/__fixtures__/after.ini';
 
 const pathToTreeBeforeJsonFile = '__tests__/__fixtures__/treeBefore.json';
-const pathToTreeAfterJsonFile = '__tests__/__fixtures__/treeBefore.json';
+const pathToTreeAfterJsonFile = '__tests__/__fixtures__/treeAfter.json';
 
 
 test('genDiff flat JSONs', () => {

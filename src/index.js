@@ -86,37 +86,43 @@ const buildAst = (dataBefore, dataAfter) => {
 };
 
 const render = (ast) => {
-  const diff = (node) => {
-    if (node.type === 'unchanged' && node.children.length === 0) {
-      return  `  ${node.key}: ${node.valueAfter}`;
-    }
-    if (node.type === 'added' && node.children.length === 0) {
-      return  `+ ${node.key}: ${node.valueAfter}`;
-    }
-    if (node.type === 'removed' && node.children.length === 0) {
-      return  `- ${node.key}: ${node.valueBefore}`;
-    }
-    if (node.type === 'changed' && node.children.length === 0) {
-      return  [`- ${node.key}: ${node.valueBefore}\n+ ${node.key}: ${node.valueAfter}`];
-    }
-    if (node.type === 'unchanged' && node.children.length > 0) {
-      return `  ${node.key}: ${render(node.children)}`;
-    }
-    if (node.type === 'added' && node.children.length > 0) {
-      return `+ ${node.key}: ${render(node.children)}`;
-    }
-    if (node.type === 'removed' && node.children.length > 0) {
-      return  `- ${node.key}: ${render(node.children)}`;
-    }
-    if (node.type === 'changed' && node.children.length > 0) {
-      return  `  ${node.key}: ${render(node.children)}`;
-    }
-    return null;
-  };
+  const iter = (data, indent) => {
+    const ind = ' '.repeat(indent);
+    const diff = (node) => {
+      if (node.type === 'unchanged' && node.children.length === 0) {
+        return `${ind}  ${node.key}: ${node.valueAfter}`;
+      }
+      if (node.type === 'added' && node.children.length === 0) {
+        return `${ind}+ ${node.key}: ${node.valueAfter}`;
+      }
+      if (node.type === 'removed' && node.children.length === 0) {
+        return `${ind}- ${node.key}: ${node.valueBefore}`;
+      }
+      if (node.type === 'changed' && node.children.length === 0) {
+        return [`${ind}- ${node.key}: ${node.valueBefore}\n${ind}+ ${node.key}: ${node.valueAfter}`];
+      }
+      if (node.type === 'unchanged' && node.children.length > 0) {
+        return `${ind}  ${node.key}: ${iter(node.children, indent + 4)}\n${' '.repeat(indent + 2)}}`;
+      }
+      if (node.type === 'added' && node.children.length > 0) {
+        return `${ind}+ ${node.key}: ${iter(node.children, indent + 4)}\n${' '.repeat(indent + 2)}}`;
+      }
+      if (node.type === 'removed' && node.children.length > 0) {
+        return `${ind}- ${node.key}: ${iter(node.children, indent + 4)}\n${' '.repeat(indent + 2)}}`;
+      }
+      if (node.type === 'changed' && node.children.length > 0) {
+        return `${ind}  ${node.key}: ${iter(node.children, indent + 4)}\n${' '.repeat(indent + 2)}}`;
+      }
+      return null;
+    };
 
-  const arr = ast.map(node => diff(node));
-  const result = ['{', ...arr, '}'].join('\n');
-  return result;
+    const arr = data.map(node => diff(node));
+    // const result = ['{', ...arr, '}'].join('\n');
+    const result = ['{', ...arr].join('\n');
+    return result;
+  };
+  const res = iter(ast, 2);
+  return `${res}\n}\n`;
 };
 
 

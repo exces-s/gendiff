@@ -13,8 +13,8 @@
         }
     }
     group1: {
-      + baz: bars
       - baz: bas
+      + baz: bars
         foo: bar
     }
   - group2: {

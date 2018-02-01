@@ -39,16 +39,21 @@ const buildAst = (dataBefore, dataAfter) => {
 
   const unionKeys = _.union(keysDataBefore, keysDataAfter);
   const ast = unionKeys.map((key) => {
-    if (!(key in dataAfter) && !(dataBefore[key] instanceof Object)) {
-      return { key, valueBefore: dataBefore[key], valueAfter: '', type: 'removed', children: [] };
+    if (Object.keys(dataBefore).length === 0) {
+      return { key, valueBefore: '', valueAfter: dataAfter[key], type: 'unchanged', children: [] };
     }
-    if (!(key in dataBefore) && !(dataBefore[key] instanceof Object)) {
-      return { key, valueBefore: '', valueAfter: dataAfter[key], type: 'added', children: [] };
+    if (Object.keys(dataAfter).length === 0) {
+      return { key, valueBefore: dataBefore[key], valueAfter: '', type: 'unchanged', children: [] };
     }
-
     if (dataBefore[key] instanceof Object || dataAfter[key] instanceof Object) {
       if (JSON.stringify(dataBefore[key]) === JSON.stringify(dataAfter[key])) {
         return { key, valueBefore: '', valueAfter: '', type: 'unchanged', children: buildAst(dataBefore[key], dataAfter[key]) };
+      }
+      if (!dataBefore[key]) {
+        return { key, valueBefore: '', valueAfter: '', type: 'added', children: buildAst({}, dataAfter[key]) };
+      }
+      if (!dataAfter[key]) {
+        return { key, valueBefore: '', valueAfter: '', type: 'removed', children: buildAst(dataBefore[key], {}) };
       }
       if (!(dataBefore[key] instanceof Object)) {
         return { key, valueBefore: dataBefore[key], valueAfter: '', type: 'changed', children: buildAst({}, dataAfter[key]) };
@@ -57,10 +62,16 @@ const buildAst = (dataBefore, dataAfter) => {
         return { key, valueBefore: '', valueAfter: dataAfter[key], type: 'changed', children: buildAst(dataBefore[key], {}) };
       }
       if (dataBefore[key] instanceof Object && dataAfter[key] instanceof Object ) {
+
         return { key, valueBefore: '', valueAfter: '', type: 'changed', children: buildAst(dataBefore[key], dataAfter[key]) };
       }
     }
-
+    if (!(key in dataAfter) && !(dataBefore[key] instanceof Object)) {
+      return { key, valueBefore: dataBefore[key], valueAfter: '', type: 'removed', children: [] };
+    }
+    if (!(key in dataBefore) && !(dataBefore[key] instanceof Object)) {
+      return { key, valueBefore: '', valueAfter: dataAfter[key], type: 'added', children: [] };
+    }
     if (dataBefore[key] === dataAfter[key]) {
       const res = { key, valueBefore: dataAfter[key], valueAfter: dataAfter[key], type: 'unchanged', children: [] };
       return res;
@@ -73,6 +84,41 @@ const buildAst = (dataBefore, dataAfter) => {
 
   return ast;
 };
+
+const render = (ast) => {
+  const diff = (node) => {
+    if (node.type === 'unchanged' && node.children.length === 0) {
+      return `  ${node.key}: ${node.valueAfter}`;
+    }
+    if (node.type === 'added' && node.children.length === 0) {
+      return `+ ${node.key}: ${node.valueAfter}`;
+    }
+    if (node.type === 'removed' && node.children.length === 0) {
+      return `- ${node.key}: ${node.valueBefore}`;
+    }
+    if (node.type === 'changed' && node.children.length === 0) {
+      return [`- ${node.key}: ${node.valueBefore}\n+ ${node.key}: ${node.valueAfter}`];
+    }
+    if (node.type === 'unchanged' && node.children.length > 0) {
+      return `  ${node.key}: ${render(node.children)}`;
+    }
+    if (node.type === 'added' && node.children.length > 0) {
+      return `+ ${node.key}: ${render(node.children)}`;
+    }
+    if (node.type === 'removed' && node.children.length > 0) {
+      return `- ${node.key}: ${render(node.children)}`;
+    }
+    if (node.type === 'changed' && node.children.length > 0) {
+      return `  ${node.key}: ${render(node.children)}`;
+    }
+    return null;
+  };
+
+  const arr = ast.map(node => diff(node));
+  const result = ['{', ...arr, '}', ''].join('\n');
+  return result;
+};
+
 
 const diffSearch = (dataBefore, dataAfter) => {
   const keysDataBefore = Object.keys(dataBefore);
@@ -114,8 +160,11 @@ const genDiff = (fileBefore, fileAfter) => {
   const parsedDataBefore = parseData(dataBefore, typeFileBefore);
   const parsedDataAfter = parseData(dataAfter, typeFileAfter);
 
-  const diffInArray = diffSearch(parsedDataBefore, parsedDataAfter);
-  return displayOutput(diffInArray);
+  const ast = buildAst(parsedDataBefore, parsedDataAfter);
+  const diff = render(ast);
+
+  // const diffInArray = diffSearch(parsedDataBefore, parsedDataAfter);
+  return displayOutput(diff);
 };
 
 export default genDiff;

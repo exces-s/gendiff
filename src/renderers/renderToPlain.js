@@ -3,36 +3,33 @@ import _ from 'lodash';
 const renderToPlain = (ast) => {
   const iter = (data, pathAcc) => {
     const checkComplexValue = arg => (arg instanceof Object ? 'complex value' : arg);
-
     const stringAction = [
       {
-        string: (node) => {
+        nested: (node) => {
           const newPathAcc = `${pathAcc}${node.key}.`;
           return iter(node.children, newPathAcc);
         },
-        check: node => node.children.length > 0,
       },
       {
-        string: node => `Property '${pathAcc}${node.key}' was added with value: ${checkComplexValue(node.valueAfter)}`,
-        check: node => node.type === 'added',
+        added: node =>
+          `Property '${pathAcc}${node.key}' was added with value: ${checkComplexValue(node.valueAfter)}`,
       },
       {
-        string: node => `Property '${pathAcc}${node.key}' was removed`,
-        check: node => node.type === 'removed',
+        removed: node =>
+          `Property '${pathAcc}${node.key}' was removed`,
       },
       {
-        string: node => `Property '${pathAcc}${node.key}' was updated. From '${node.valueBefore}' to '${node.valueAfter}'`,
-        check: node => node.type === 'updated',
+        updated: node =>
+          `Property '${pathAcc}${node.key}' was updated. From '${node.valueBefore}' to '${node.valueAfter}'`,
       },
       {
-        string: () => '',
-        check: node => node.type === 'unchanged',
+        unchanged: () => '',
       },
     ];
 
     const getString = (arg) => {
-      const { string } = _.find(stringAction, ({ check }) => check(arg));
-      return string(arg);
+      const obj = _.find(stringAction, object => object[arg.type]);
+      return obj[arg.type](arg);
     };
 
     const result = data.map(node => getString(node)).filter(v => v);

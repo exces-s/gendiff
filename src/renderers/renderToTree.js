@@ -23,7 +23,7 @@ const renderToTree = (ast) => {
     const stringAction = [
       {
         string: node => `${indent}  ${node.key}: {\n${iter(node.children, indentLvl + 4)}\n${indForBrace}}`,
-        check: node => node.type === 'changed',
+        check: node => node.type === 'nested',
       },
       {
         string: node => `${indent}  ${node.key}:${valueString(node.valueAfter)}`,

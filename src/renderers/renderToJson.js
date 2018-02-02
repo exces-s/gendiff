@@ -5,7 +5,7 @@ const renderToJson = (ast) => {
     const dataAction = [
       {
         pair: node => ({ [`  ${node.key}`]: iter(node.children) }),
-        check: node => node.type === 'changed',
+        check: node => node.type === 'nested',
       },
       {
         pair: node => ({ [`  ${node.key}`]: node.valueAfter }),

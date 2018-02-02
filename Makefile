@@ -12,3 +12,4 @@ lint:
 
 test:
 	npm test
+

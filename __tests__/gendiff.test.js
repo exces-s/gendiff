@@ -4,6 +4,7 @@ import genDiff from '../src';
 // path to file from package root
 const pathToResultFile = '__tests__/__fixtures__/result.txt';
 const pathToResultTreeFile = '__tests__/__fixtures__/resultTree.txt';
+const pathToPlainResultTreeFile = '__tests__/__fixtures__/resultPlain.txt';
 
 const pathToBeforeJsonFile = '__tests__/__fixtures__/before.json';
 const pathToAfterJsonFile = '__tests__/__fixtures__/after.json';
@@ -22,7 +23,6 @@ const pathToTreeAfterYamlFile = '__tests__/__fixtures__/treeAfter.yml';
 
 const pathToTreeBeforeIniFile = '__tests__/__fixtures__/treeBefore.ini';
 const pathToTreeAfterIniFile = '__tests__/__fixtures__/treeAfter.ini';
-
 
 test('genDiff flat JSONs', () => {
   expect(genDiff(pathToBeforeJsonFile, pathToAfterJsonFile))
@@ -51,4 +51,8 @@ test('genDiff tree YAMLs', () => {
 test('genDiff tree INIs', () => {
   expect(genDiff(pathToTreeBeforeIniFile, pathToTreeAfterIniFile))
     .toEqual(fs.readFileSync(pathToResultTreeFile, 'utf8'));
+});
+test('genDiff tree JSONs in plain output', () => {
+  expect(genDiff(pathToTreeBeforeJsonFile, pathToTreeAfterJsonFile, 'plain'))
+    .toEqual(fs.readFileSync(pathToPlainResultTreeFile, 'utf8'));
 });

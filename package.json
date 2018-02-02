@@ -1,6 +1,6 @@
 {
   "name": "gendiff-la",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "gendiff CLI",
   "main": "dist/index.js",
   "bin": {

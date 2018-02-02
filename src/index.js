@@ -98,10 +98,7 @@ const buildAst = (dataBefore, dataAfter) => {
   return ast;
 };
 
-const displayOutput = (resultString) => {
-  console.log(resultString);
-  return resultString;
-};
+const displayOutput = resultString => resultString;
 
 const genDiff = (fileBefore, fileAfter, outputStyle) => {
   const typeFileBefore = path.extname(fileBefore);

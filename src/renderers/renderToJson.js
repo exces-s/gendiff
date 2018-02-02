@@ -36,7 +36,7 @@ const renderToJson = (ast) => {
     const obj = data.reduce((acc, node) => ({ ...acc, ...getData(node) }), {});
     return obj;
   };
-  const output = JSON.stringify(iter(ast), null, '\t');
+  const output = JSON.stringify(iter(ast));
   return `${output}\n`;
 };
 

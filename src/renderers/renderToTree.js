@@ -5,12 +5,12 @@ const renderToTree = (ast) => {
     const indForBrace = ' '.repeat(indLvl + 2);
 
     const objToString = (arg) => {
-      if (!(arg instanceof Object)) {
-        return arg;
-      }
       const keys = Object.keys(arg);
-      return keys.map(key => (arg[key] instanceof Object ? objToString(arg[key]) :
-        `${key}: ${arg[key]}`));
+
+      const pair = keys.map(key => (arg[key] instanceof Object ?
+        objToString(arg[key]) : `${key}: ${arg[key]}`));
+
+      return pair.join(`\n ${' '.repeat(indLvl + 4)} `);
     };
 
     const diff = (node) => {
@@ -35,7 +35,7 @@ const renderToTree = (ast) => {
       if (node.type === 'removed' && node.children.length === 0) {
         return `${indent}- ${node.key}: ${node.valueBefore}`;
       }
-      if (node.type === 'changed' && node.children.length === 0) {
+      if (node.type === 'updated' && node.children.length === 0) {
         return [`${indent}- ${node.key}: ${node.valueBefore}\n${indent}+ ${node.key}: ${node.valueAfter}`];
       }
       return null;

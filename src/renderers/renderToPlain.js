@@ -6,13 +6,13 @@ const renderToPlain = (ast) => {
         const newPathAcc = `${pathAcc}${node.key}.`;
         return iter(node.children, newPathAcc);
       }
-      if (node.type === 'added' && node.children.length === 0) {
+      if (node.type === 'added') {
         return `Property '${pathAcc}${node.key}' was added with value: ${checkComplexValue(node.valueAfter)}`;
       }
-      if (node.type === 'removed' && node.children.length === 0) {
+      if (node.type === 'removed') {
         return `Property '${pathAcc}${node.key}' was removed`;
       }
-      if (node.type === 'changed' && node.children.length === 0) {
+      if (node.type === 'updated') {
         return `Property '${pathAcc}${node.key}' was updated. From '${node.valueBefore}' to '${node.valueAfter}'`;
       }
       return null;

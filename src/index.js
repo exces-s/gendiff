@@ -23,63 +23,78 @@ const buildAst = (dataBefore, dataAfter) => {
   const keysDataAfter = Object.keys(dataAfter);
   const unionKeys = _.union(keysDataBefore, keysDataAfter);
 
+  const sampleNode = {
+    key: '',
+    valueBefore: '',
+    valueAfter: '',
+    type: '',
+    children: [],
+  };
+
   const ast = unionKeys.map((key) => {
-    if (JSON.stringify(dataBefore[key]) === JSON.stringify(dataAfter[key])) {
-      return {
-        key,
-        valueBefore: dataBefore[key],
-        valueAfter: dataAfter[key],
-        type: 'unchanged',
-        children: [],
-      };
-    }
-    if (dataAfter[key] instanceof Object && dataBefore[key] instanceof Object) {
-      return {
-        key,
-        valueBefore: '',
-        valueAfter: '',
-        type: 'changed',
-        children: buildAst(dataBefore[key], dataAfter[key]),
-      };
-    }
-    if (key in dataAfter && key in dataBefore) {
-      return {
-        key,
-        valueBefore: dataBefore[key],
-        valueAfter: dataAfter[key],
-        type: 'changed',
-        children: [],
-      };
-    }
-    if (dataBefore[key] === dataAfter[key]) {
-      return {
-        key,
-        valueBefore: dataAfter[key],
-        valueAfter: dataAfter[key],
-        type: 'unchanged',
-        children: [],
-      };
-    }
-    if (!(key in dataAfter)) {
-      return {
-        key,
-        valueBefore: dataBefore[key],
-        valueAfter: '',
-        type: 'removed',
-        children: [],
-      };
-    }
-    if (!(key in dataBefore)) {
-      return {
-        key,
-        valueBefore: '',
-        valueAfter: dataAfter[key],
-        type: 'added',
-        children: [],
-      };
-    }
-    return null;
+    const defineType = [
+      {
+        node: {
+          type: 'changed',
+        },
+        check: arg =>
+          dataAfter[arg] instanceof Object && dataBefore[arg] instanceof Object,
+      },
+      {
+        node: {
+          type: 'unchanged',
+          valueBefore: dataBefore[key],
+          valueAfter: dataAfter[key],
+        },
+        check: arg =>
+          JSON.stringify(dataBefore[arg]) === JSON.stringify(dataAfter[arg]),
+      },
+      {
+        node: {
+          type: 'unchanged',
+          valueBefore: dataBefore[key],
+          valueAfter: dataAfter[key],
+        },
+        check: arg => dataBefore[arg] === dataAfter[arg],
+      },
+      {
+        node: {
+          type: 'updated',
+          valueBefore: dataBefore[key],
+          valueAfter: dataAfter[key],
+        },
+        check: arg => arg in dataAfter && arg in dataBefore,
+      },
+      {
+        node: {
+          type: 'removed',
+          valueBefore: dataBefore[key],
+        },
+        check: arg => !(arg in dataAfter),
+      },
+      {
+        node: {
+          type: 'added',
+          valueAfter: dataAfter[key],
+        },
+        check: arg => !(arg in dataBefore),
+      },
+    ];
+
+    const getNodeProps = arg => _.find(defineType, ({ check }) => check(arg)).node;
+
+    const nodeProps = getNodeProps(key);
+
+    const getChildrenValue = () => (nodeProps.type === 'changed' ?
+      buildAst(dataBefore[key], dataAfter[key]) : []);
+    return {
+      ...sampleNode,
+      ...nodeProps,
+      key,
+      children: getChildrenValue(),
+    };
   });
+
   return ast;
 };
 

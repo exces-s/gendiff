@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 const renderToTree = (ast) => {
   const iter = (data, indentLvl) => {
     const indent = ' '.repeat(indentLvl);
@@ -20,33 +18,19 @@ const renderToTree = (ast) => {
       return value instanceof Object ? stringForComplex : stringForSimple;
     };
 
-    const stringAction = [
-      {
-        string: node => `${indent}  ${node.key}: {\n${iter(node.children, indentLvl + 4)}\n${indForBrace}}`,
-        check: node => node.type === 'nested',
-      },
-      {
-        string: node => `${indent}  ${node.key}:${valueString(node.valueAfter)}`,
-        check: node => node.type === 'unchanged',
-      },
-      {
-        string: node => `${indent}+ ${node.key}:${valueString(node.valueAfter)}`,
-        check: node => node.type === 'added',
-      },
-      {
-        string: node => `${indent}- ${node.key}:${valueString(node.valueBefore)}`,
-        check: node => node.type === 'removed',
-      },
-      {
-        string: node => [`${indent}- ${node.key}: ${node.valueBefore}\n${indent}+ ${node.key}: ${node.valueAfter}`],
-        check: node => node.type === 'updated',
-      },
-    ];
-
-    const getString = (arg) => {
-      const { string } = _.find(stringAction, ({ check }) => check(arg));
-      return string(arg);
+    const stringAction = {
+      nested: node =>
+        `${indent}  ${node.key}: {\n${iter(node.children, indentLvl + 4)}\n${indForBrace}}`,
+      unchanged: node =>
+        `${indent}  ${node.key}:${valueString(node.valueAfter)}`,
+      added: node =>
+        `${indent}+ ${node.key}:${valueString(node.valueAfter)}`,
+      removed: node =>
+        `${indent}- ${node.key}:${valueString(node.valueBefore)}`,
+      updated: node =>
+        [`${indent}- ${node.key}: ${node.valueBefore}\n${indent}+ ${node.key}: ${node.valueAfter}`],
     };
+    const getString = node => stringAction[node.type](node);
 
     const arr = data.map(node => getString(node));
     return arr.join('\n');

@@ -13,3 +13,5 @@ lint:
 test:
 	npm test
 
+git:
+	nano package.json && git status

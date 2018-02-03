@@ -1,6 +1,7 @@
 const renderToPlain = (ast) => {
   const iter = (data, pathAcc) => {
     const checkComplexValue = arg => (arg instanceof Object ? 'complex value' : arg);
+
     const stringAction = {
       nested: (node) => {
         const newPathAcc = `${pathAcc}${node.key}.`;

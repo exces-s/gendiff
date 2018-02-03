@@ -30,6 +30,7 @@ const renderToTree = (ast) => {
       updated: node =>
         [`${indent}- ${node.key}: ${node.valueBefore}\n${indent}+ ${node.key}: ${node.valueAfter}`],
     };
+
     const getString = node => stringAction[node.type](node);
 
     const arr = data.map(node => getString(node));

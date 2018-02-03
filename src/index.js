@@ -18,6 +18,57 @@ const parseData = (data, dataType) => {
   return parse(data);
 };
 
+const nodeProperties = [
+  {
+    node: (valueBefore, valueAfter, fn) => ({
+      type: 'nested',
+      children: fn(valueBefore, valueAfter),
+    }),
+    check: (key, dataBefore, dataAfter) =>
+      dataAfter[key] instanceof Object && dataBefore[key] instanceof Object,
+  },
+  {
+    node: (valueBefore, valueAfter) => ({
+      type: 'unchanged',
+      valueBefore,
+      valueAfter,
+    }),
+    check: (key, dataBefore, dataAfter) =>
+      JSON.stringify(dataBefore[key]) === JSON.stringify(dataAfter[key]),
+  },
+  {
+    node: (valueBefore, valueAfter) => ({
+      type: 'updated',
+      valueBefore,
+      valueAfter,
+    }),
+    check: (key, dataBefore, dataAfter) =>
+      key in dataAfter && key in dataBefore,
+  },
+  {
+    node: valueBefore => ({
+      type: 'removed',
+      valueBefore,
+    }),
+    check: (key, dataBefore, dataAfter) =>
+      !(key in dataAfter),
+  },
+  {
+    node: (valueBefore, valueAfter) => ({
+      type: 'added',
+      valueAfter,
+    }),
+    check: (key, dataBefore) => !(key in dataBefore),
+  },
+];
+
+const getNodeProps = (key, dataBefore, dataAfter, fn) => {
+  const { node } = _.find(nodeProperties, ({ check }) =>
+    check(key, dataBefore, dataAfter));
+
+  return node(dataBefore[key], dataAfter[key], fn);
+};
+
 const buildAst = (dataBefore, dataAfter) => {
   const keysDataBefore = Object.keys(dataBefore);
   const keysDataAfter = Object.keys(dataAfter);
@@ -31,55 +82,8 @@ const buildAst = (dataBefore, dataAfter) => {
     children: [],
   };
 
-  const nodeProperties = [
-    {
-      node: key => ({
-        type: 'nested',
-        children: buildAst(dataBefore[key], dataAfter[key]),
-      }),
-      check: key =>
-        dataAfter[key] instanceof Object && dataBefore[key] instanceof Object,
-    },
-    {
-      node: key => ({
-        type: 'unchanged',
-        valueBefore: dataBefore[key],
-        valueAfter: dataAfter[key],
-      }),
-      check: key =>
-        JSON.stringify(dataBefore[key]) === JSON.stringify(dataAfter[key]),
-    },
-    {
-      node: key => ({
-        type: 'updated',
-        valueBefore: dataBefore[key],
-        valueAfter: dataAfter[key],
-      }),
-      check: key => key in dataAfter && key in dataBefore,
-    },
-    {
-      node: key => ({
-        type: 'removed',
-        valueBefore: dataBefore[key],
-      }),
-      check: key => !(key in dataAfter),
-    },
-    {
-      node: key => ({
-        type: 'added',
-        valueAfter: dataAfter[key],
-      }),
-      check: key => !(key in dataBefore),
-    },
-  ];
-
-  const getNodeProps = (key) => {
-    const props = _.find(nodeProperties, ({ check }) => check(key)).node;
-    return props(key);
-  };
-
   const ast = unionKeys.map((key) => {
-    const nodeProps = getNodeProps(key);
+    const nodeProps = getNodeProps(key, dataBefore, dataAfter, buildAst);
 
     return {
       ...sampleNode,
@@ -87,7 +91,6 @@ const buildAst = (dataBefore, dataAfter) => {
       key,
     };
   });
-
   return ast;
 };
 

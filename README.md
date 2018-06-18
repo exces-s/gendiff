@@ -21,7 +21,9 @@ $ gendiff before.json after.json
 
 ### Use: 
 `gendiff before.json after.json` - сравнение двух json-файлов.
+
 `gendiff before.yml after.yml` - сравнение двух yaml-файлов.
+
 `gendiff before.ini after.ini` - сравнение двух ini-файлов.
 
 ### Flags:

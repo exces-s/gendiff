@@ -4,10 +4,10 @@ import renderToJson from './renderToJson';
 
 const rendererSelect = {
   plain: renderToPlain,
-  undefined: renderToTree,
   json: renderToJson,
 };
 
-const getRenderer = outputStyle => rendererSelect[outputStyle];
+const getRenderer = outputStyle => outputStyle === 'undefined' ?
+      'renderToTree' : rendererSelect[outputStyle];
 
 export default getRenderer;

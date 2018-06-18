@@ -7,7 +7,7 @@ const rendererSelect = {
   json: renderToJson,
 };
 
-const getRenderer = outputStyle => outputStyle === 'undefined' ?
+const getRenderer = outputStyle => outputStyle === undefined ?
       'renderToTree' : rendererSelect[outputStyle];
 
 export default getRenderer;

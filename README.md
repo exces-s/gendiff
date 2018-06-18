@@ -1,4 +1,4 @@
-### Вычислитель отличий
+## Вычислитель отличий
 Небольшая cli-утилита для поиска отличий в конфигурационных файлах (json, yaml, ini).
 ```
 $ gendiff before.json after.json
@@ -19,12 +19,12 @@ $ gendiff before.json after.json
 
 [![Build Status](https://travis-ci.org/exces-s/project-lvl2-s185.svg?branch=master)](https://travis-ci.org/exces-s/project-lvl2-s185)
 
-## Use: 
+### Use: 
 `gendiff before.json after.json` - сравнение двух json-файлов.
 `gendiff before.yml after.yml` - сравнение двух yaml-файлов.
 `gendiff before.ini after.ini` - сравнение двух ini-файлов.
 
-# Flags:
+### Flags:
 `--format` - позволяет вывести дифф в плоском формате:
 ```
 $ gendiff --format plain before.json after.json

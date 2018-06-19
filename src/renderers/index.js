@@ -8,6 +8,6 @@ const rendererSelect = {
 };
 
 const getRenderer = outputStyle => (outputStyle === undefined ?
-  'renderToTree' : rendererSelect[outputStyle]);
+  renderToTree : rendererSelect[outputStyle]);
 
 export default getRenderer;

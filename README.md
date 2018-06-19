@@ -18,6 +18,8 @@ $ gendiff before.json after.json
 [![Build Status](https://travis-ci.org/exces-s/project-lvl2-s185.svg?branch=master)](https://travis-ci.org/exces-s/project-lvl2-s185)
 
 ### Use: 
+install: `sudo npm install -g gendiff-la`.
+
 `gendiff before.json after.json` - сравнение двух json-файлов.
 
 `gendiff before.yml after.yml` - сравнение двух yaml-файлов.
